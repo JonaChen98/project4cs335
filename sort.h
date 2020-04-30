@@ -76,7 +76,7 @@ void shellsort( vector<Comparable> & a )
  * Standard heapsort.
  */
 template <typename Comparable>
-void heapsort( vector<Comparable> & a )
+void HeapSort( vector<Comparable> & a )
 {
     for( int i = a.size( ) / 2 - 1; i >= 0; --i )  /* buildHeap */
         percDown( a, i, a.size( ) );
@@ -122,6 +122,34 @@ void percDown( vector<Comparable> & a, int i, int n )
     a[ i ] = std::move( tmp );
 }
 
+
+template <typename Comparable , typename Comparator>
+void merge( vector<Comparable> & a, vector<Comparable> & tmpArray,
+            int leftPos, int rightPos, int rightEnd, Comparator less_than )
+{
+    int leftEnd = rightPos - 1;
+    int tmpPos = leftPos;
+    int numElements = rightEnd - leftPos + 1;
+
+    // Main loop
+    while( leftPos <= leftEnd && rightPos <= rightEnd )
+        // if( a[ leftPos ] <= a[ rightPos ] )
+        if(less_than(a[leftPos], a[rightPos] ))
+            tmpArray[ tmpPos++ ] = std::move( a[ leftPos++ ] );
+        else
+            tmpArray[ tmpPos++ ] = std::move( a[ rightPos++ ] );
+
+    while( leftPos <= leftEnd )    // Copy rest of first half
+        tmpArray[ tmpPos++ ] = std::move( a[ leftPos++ ] );
+
+    while( rightPos <= rightEnd )  // Copy rest of right half
+        tmpArray[ tmpPos++ ] = std::move( a[ rightPos++ ] );
+
+    // Copy tmpArray back
+    for( int i = 0; i < numElements; ++i, --rightEnd )
+        a[ rightEnd ] = std::move( tmpArray[ rightEnd ] );
+}
+
 /**
  * Internal method that makes recursive calls.
  * a is an array of Comparable items.
@@ -130,16 +158,15 @@ void percDown( vector<Comparable> & a, int i, int n )
  * right is the right-most index of the subarray.
  */
 template <typename Comparable , typename Comparator>
-void mergeSort( vector<Comparable> & a,
+void MergeSort( vector<Comparable> & a,
                 vector<Comparable> & tmpArray, int left, int right, Comparator less_than )
 {
-    // if( left < right )
-    if (lessthan(left,right))
+    if( left < right )
     {
         int center = ( left + right ) / 2;
-        mergeSort( a, tmpArray, left, center, less_than );
-        mergeSort( a, tmpArray, center + 1, right, less_than );
-        merge( a, tmpArray, left, center + 1, right, less_than );
+        MergeSort( a, tmpArray, left, center, less_than );
+        MergeSort( a, tmpArray, center + 1, right, less_than );
+        merge( a, tmpArray, left, center + 1, right , less_than );
     }
 }
 
@@ -147,11 +174,11 @@ void mergeSort( vector<Comparable> & a,
  * Mergesort algorithm (driver).
  */
 template <typename Comparable, typename Comparator>
-void mergeSort( vector<Comparable> & a , Comparator less_than )
+void MergeSort( vector<Comparable> & a , Comparator less_than )
 {
     vector<Comparable> tmpArray( a.size( ) );
 
-    mergeSort( a, tmpArray, 0, a.size( ) - 1, less_than );
+    MergeSort( a, tmpArray, 0, a.size( ) - 1, less_than );
 }
 
 
@@ -163,36 +190,36 @@ void mergeSort( vector<Comparable> & a , Comparator less_than )
  * rightPos is the index of the start of the second half.
  * rightEnd is the right-most index of the subarray.
  */
-template <typename Comparable, typename Comparator>
-void merge( vector<Comparable> & a, vector<Comparable> & tmpArray,
-            int leftPos, int rightPos, int rightEnd , Comparator less_than )
-{
-    int leftEnd = rightPos - 1;
-    int tmpPos = leftPos;
-    int numElements = rightEnd - leftPos + 1;
+// template <typename Comparable, typename Comparator>
+// void merge( vector<Comparable> & a, vector<Comparable> & tmpArray,
+//             int leftPos, int rightPos, int rightEnd , Comparator less_than )
+// {
+//     int leftEnd = rightPos - 1;
+//     int tmpPos = leftPos;
+//     int numElements = rightEnd - leftPos + 1;
 
-    // Main loop
-    // while( leftPos <= leftEnd && rightPos <= rightEnd )
-    while(less_than(leftPos , leftEnd) && less_than(rightPos, rightEnd)) {
-        // if( a[ leftPos ] <= a[ rightPos ] )
-            if ( less_than(a[leftPos], a[rightPos] || a[leftPos] == a[rightPos]))
-            tmpArray[ tmpPos++ ] = std::move( a[ leftPos++ ] );
-        else
-            tmpArray[ tmpPos++ ] = std::move( a[ rightPos++ ] );
-    }
-    // while( leftPos <= leftEnd )    // Copy rest of first half
-    while ( lessthan(leftPos, leftEnd)) {
-        tmpArray[ tmpPos++ ] = std::move( a[ leftPos++ ] );
-    }
-    // while( rightPos <= rightEnd )  // Copy rest of right half
+//     // Main loop
+//     // while( leftPos <= leftEnd && rightPos <= rightEnd )
+//     while(less_than(leftPos , leftEnd) && less_than(rightPos, rightEnd)) {
+//         // if( a[ leftPos ] <= a[ rightPos ] )
+//             if ( less_than(a[leftPos], a[rightPos] || a[leftPos] == a[rightPos]))
+//             tmpArray[ tmpPos++ ] = std::move( a[ leftPos++ ] );
+//         else
+//             tmpArray[ tmpPos++ ] = std::move( a[ rightPos++ ] );
+//     }
+//     // while( leftPos <= leftEnd )    // Copy rest of first half
+//     while ( less_than(leftPos, leftEnd)) {
+//         tmpArray[ tmpPos++ ] = std::move( a[ leftPos++ ] );
+//     }
+//     // while( rightPos <= rightEnd )  // Copy rest of right half
     
-    while (lessthan(leftPos , leftEnd)) {
-        tmpArray[ tmpPos++ ] = std::move( a[ rightPos++ ] );
-    }
-    // Copy tmpArray back
-    for( int i = 0; i < numElements; ++i, --rightEnd )
-        a[ rightEnd ] = std::move( tmpArray[ rightEnd ] );
-}
+//     while (less_than(leftPos , leftEnd)) {
+//         tmpArray[ tmpPos++ ] = std::move( a[ rightPos++ ] );
+//     }
+//     // Copy tmpArray back
+//     for( int i = 0; i < numElements; ++i, --rightEnd )
+//         a[ rightEnd ] = std::move( tmpArray[ rightEnd ] );
+// }
 
 
 /**
@@ -224,7 +251,7 @@ const Comparable & median3( vector<Comparable> & a, int left, int right )
  * right is the right-most index of the subarray.
  */
 template <typename Comparable, typename Comparator>
-void quicksort( vector<Comparable> & a, int left, int right, Comparator less_than )
+void QuickSort( vector<Comparable> & a, int left, int right, Comparator less_than )
 {
     if( left + 10 <= right )
     {
@@ -247,8 +274,8 @@ void quicksort( vector<Comparable> & a, int left, int right, Comparator less_tha
 
         std::swap( a[ i ], a[ right - 1 ] );  // Restore pivot
 
-        quicksort( a, left, i - 1 );     // Sort small elements
-        quicksort( a, i + 1, right );    // Sort large elements
+        QuickSort( a, left, i - 1, less_than);     // Sort small elements
+        QuickSort( a, i + 1, right, less_than);    // Sort large elements
     }
     else  // Do an insertion sort on the subarray
         insertionSort( a, left, right, less_than );
@@ -258,9 +285,9 @@ void quicksort( vector<Comparable> & a, int left, int right, Comparator less_tha
  * Quicksort algorithm (driver).
  */
 template <typename Comparable , typename Comparator>
-void quicksort( vector<Comparable> & a , Comparator less_than)
+void QuickSort( vector<Comparable> & a , Comparator less_than)
 {
-    quicksort( a, 0, a.size( ) - 1, less_than);
+    QuickSort( a, 0, a.size( ) - 1, less_than);
 }
 
 
@@ -385,7 +412,7 @@ template <typename RandomIterator>
 void insertionSort( const RandomIterator & begin,
                     const RandomIterator & end )
 {
-    insertionSort( begin, end, less<decltype(*begin )>{ } );
+    insertionSort( begin, end, less<decltype(*begin )>() );
 }
 
 

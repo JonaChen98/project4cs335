@@ -31,14 +31,18 @@ void TestTiming() {
 vector<int> GenerateRandomVector(size_t size_of_vector) {
   // Use rand() to generate random integer
   // Add code
+  unsigned seed = time(0);
+  srand(seed);
   vector<int> randomvector;
+  int randnum = 0;
 
-  for (int i = 0; i < size_of_vector -1; i++) {
-      int randnum = rand() % 1000 + 1;
+  for (int i = 0; i < size_of_vector ; i++) {
+      randnum = rand();
       randomvector.push_back(randnum);
   }
 
-
+  return randomvector;
+  
 }
 
 // Generate and returns sorted vecotr of size @size_of_vector
@@ -97,20 +101,11 @@ bool VerifyOrder(const vector<Comparable> &input, Comparator less_than) {
 }
 
 // Computes duration given a start time and a stop time in nano seconds
-auto ComputeDuration(chrono::high_resolution_clock::time_point start_time, chrono::high_resolution_clock::time_point end_time) {
+long long ComputeDuration(chrono::high_resolution_clock::time_point start_time, chrono::high_resolution_clock::time_point end_time) {
   // Add code
 
-    // auto now = start_time;
-    // auto now_ms = std::chrono::time_point_cast<std::chrono::nanoseconds>(now);
-    // auto value = end_time;
-    // auto value_ns = std::chrono::time_point_cast<std::chrono::nanoseconds>(end_time);
-    // auto differce = value_ns - now_ms;
-    // long duration = differce.count();
-
-    // return duration;
-    auto difference = start_time - end_time;
-
-    return difference;
+    return chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
+    
 }
 
 // Wrapper function to test different sorting algorithms
@@ -136,12 +131,25 @@ void sortTestingWrapper(int argc, char **argv) {
 
   cout << "Running sorting algorithms: " << input_type << " " << input_size << " numbers " << comparison_type << endl;
   vector<int> input_vector;
+  vector<int> merge_vector;
+  vector<int> quick_vector;
+  vector<int> heap_vector;
   if (input_type == "random") {
-    // Generate random vector
     input_vector = GenerateRandomVector(input_size);
+    cout << "generated random vector beggining sort" << endl;
+    if (comparison_type == "greater") {
+      MergeSort(input_vector,greater<int>());
+      for(int i = 0; i < input_vector.size(); i++){
+        cout << input_vector[i]  << endl;
+      }
+    }
+  }
+  
+     
+
 
     
-  } else {
+   else {
     if ( comparison_type == "less") {
       input_vector = GenerateSortedVector(input_size, true);
     }
@@ -152,6 +160,7 @@ void sortTestingWrapper(int argc, char **argv) {
     
 
   }
+
 
   // Call quicksort / heapsort / mergesort using appropriate input.
   // ...
